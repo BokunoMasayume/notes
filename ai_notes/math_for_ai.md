@@ -1478,3 +1478,59 @@ $$
 
 一元函数的导数推广到多元情形就变成了梯度.
 
+#### 定义5.5 偏导数
+
+给定n元函数$f: \mathbb{R}^n \to \mathbb{R}, x \mapsto f(x), x\in \mathbb{R}^n$, 它的各偏导数为
+$$
+\frac{\delta f}{\delta x_i} = \lim_{h\to 0}\frac{f(x_i+h, x1,\dots,x_n) - f(x_1,\dots, x_n)}{h}
+$$
+
+
+然后将各偏导数组合为向量, 就得到了梯度向量:
+$$
+\nabla_xf = grad f = \frac{df}{dx} = [\frac{\delta f}{\delta x_1}, \dots, \frac{\delta f}{\delta x_n}] \in \mathbb{R}^{1\times n}
+$$
+其中n是变元数, 1是f象集(陪域)的维数. 我们在此定义列向量$x=[x_1,\dots,x_n]^T\in \mathbb{R}^n$. 行向量称为f的梯度或者jacobi矩阵
+
+> jacobi矩阵是不是在函数是$f: \mathbb{R}^n\to \mathbb{R}^m$的情况.
+
+> 注意梯度向量是个行向量, 特地写明了$\mathbb{R}^{1\times n}, 而非\mathbb{R}^n$, 行向量可以作用于对应的列向量(比如$\mathbb{R}^n$上的列向量x)得到一个标量, 这样的行向量称为余向量(covector)
+
+
+
+### 偏导数的基本法则
+
+$$
+Product \ rule: \frac{\delta}{\delta x}[f(x)g(x)] = \frac{\delta f}{\delta x}g(x) + \frac{\delta g}{\delta x}f(x)\\
+Sum \ rule: \frac{\delta}{\delta x}[f(x) + g(x)] = \frac{\delta f}{\delta x} + \frac{\delta g}{\delta x}\\
+Chain\ rule: \frac{\partial}{\partial x}(g\circ f)(x) = \frac{\partial g}{\partial f}\frac{\partial f}{\partial x}
+$$
+
+### 链式法则
+
+考虑变元为$x_1, x_2$的函数$f: \mathbb{R}^2 \to \mathbb{R}$, 而$x_1(t), x_2(t)$又是变元t的函数. 为了计算f对t的梯度, 需要用到链式法则
+$$
+\frac{\mathrm{d} f}{\mathrm{d} t} = \begin{bmatrix}\frac{\partial f}{\partial x_1}, \frac{\partial f}{\partial x_2} \end{bmatrix}\begin{bmatrix}\frac{\partial x_1(t)}{\partial t}\\ \frac{\partial x_2(t)}{\partial t}\end{bmatrix} = \frac{\partial f}{\partial x_1}\frac{\partial x_1}{\partial t} + \frac{\partial f}{\partial x_2}\frac{\partial x_2}{\partial t}
+$$
+其中$\mathrm{d}$表示梯度, $\partial$表示偏导数.
+
+
+
+## 向量值函数的梯度
+
+之前讨论的是$f: \mathbb{R}^n \to \mathbb{R}$的偏导数和梯度, 接下来要将这个概念扩展至向量值函数(向量场)$f: \mathbb{R}^n\to\mathbb{R}^m$的情形, 其中$n\ge1, m\ge 1$.
+
+给定向量值函数$f: \mathbb{R}^n \to\mathbb{R}^m, 和向量x = [x_1,\dots,x_n]^T\in \mathbb{R}^n$, 该函数的函数值可以写为
+$$
+f(x) = \begin{bmatrix}f_1(x)\\\vdots\\f_m(x)\end{bmatrix} \in mathbb{R}^m
+$$
+这样, 向量值函数f对变元$x_i$的偏导数为
+$$
+\frac{\partial f}{\partial x_i} = \begin{bmatrix} \frac{\partial f_1}{\partial x_i} \\\vdots \\\frac{\partial f_m}{\partial x_i}\end{bmatrix}
+$$
+f对x的梯度就是这些偏导数作为列排起来的矩阵
+
+
+
+#### 定义5.6 Jacobi矩阵
+
