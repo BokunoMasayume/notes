@@ -1534,3 +1534,39 @@ f对x的梯度就是这些偏导数作为列排起来的矩阵
 
 #### 定义5.6 Jacobi矩阵
 
+向量值函数$f: \mathbb{R}^n \to \mathbb{R}^m$的各一阶偏微分的合集称为Jacobi矩阵, 它的形状是$m\times n$, 定义如下:
+$$
+J = \nabla_xf = \frac{\mathrm{d}f}{\mathrm{d}x} = \begin{bmatrix}\frac{\partial f}{\partial x_1},\dots,\frac{\partial f}{\partial x_n} \end{bmatrix} = \begin{bmatrix} \frac{\partial f_1}{\partial x_1}&\cdots&\frac{\partial f_1}{\partial x_n} \\\vdots & \cdots&\vdots\\
+\frac{\partial f_m}{\partial x_1}&\cdots&\frac{\partial f_m}{\partial x_n}\end{bmatrix} \\
+J(i, j) = \frac{\partial f_i}{\partial x_j}
+$$
+
+> 本书的微分使用分子布局(numerator layout), 即f决定矩阵有几行, x决定矩阵有几列. 如果是分母布局(denominator layout), 就是分子布局的转置
+
+行列式可以用来计算面积, 变换矩阵的行列式是整体的缩放比例, J acobi矩阵的行列式$|J|$称为Jacobi行列式, 它的值就是面积或体积变换前后的缩放比例.
+
+容易证明, 变换矩阵其实就是变换映射的Jacobi矩阵
+$$
+给定 f(x) = Ax, f(x) \in \mathbb{R}^M, A\in \mathbb{R}^{M\times N} \\
+为了计算梯度\frac{df}{dx}, 首先确定它的维度: 由于f: \mathbb{R}^N \to \mathbb{R}^M, 所以\frac{df}{dx} \in \mathbb{R}^{M\times N}, 为了计算梯度, 接下来计算每个偏导数\\
+f_i(x) = \sum_{j=1}^NA_{i,j}x \Longrightarrow \frac{\partial f_i}{\partial x_j} = A_{i,j}\\
+故 \frac{df}{dx} = A \in \mathbb{R}^{M\times N}
+$$
+
+
+Jacobi行列式在机器学习和深度学习的重参数技巧(Reparametrization Trick)中十分重要, 也被称为无穷摄动分析(Infinite Perturbation Analysis)
+
+## 矩阵的梯度
+
+当求矩阵对向量(或其他矩阵)的梯度时, 结果是一个多维度的张量(tensor). 
+
+如果我们求mxn的矩阵A对pxq的矩阵B的梯度, 结果Jacobi矩阵的形状将是(m x n)x(p x q), 即一个四维张量J, 它的每个分量可以写作 $j_{i,j,k,l} = \frac{\partial A_{i,j}}{\partial B_{k,l}}$
+
+>这个例子是从pxq的矩阵映射成mxn的函数
+
+
+
+## 常用梯度恒等式
+
+下面给出一些机器学习中常用的梯度恒等式(Petersen and Pedersen, 2012)
+
