@@ -729,7 +729,7 @@ $$
 $$
 x = \sum_{m=1}^{M}\lambda_mb_m + \sum_{j=1}^{D-M}\phi_jb_j^{\perp}, \lambda_m, \phi_j \in \mathbb{R}
 $$
- 
+
 
 其中b是U的基, $b^{\perp}$是$U^{\perp}$的一个基.
 
@@ -1568,5 +1568,138 @@ Jacobi行列式在机器学习和深度学习的重参数技巧(Reparametrizatio
 
 ## 常用梯度恒等式
 
-下面给出一些机器学习中常用的梯度恒等式(Petersen and Pedersen, 2012)
+下面给出一些机器学习中常用的梯度恒等式(Petersen and Pedersen, 2012
+
+其中$f(x)^{-1}$表示$f(x)$的逆(假设其存在).
+$$
+\frac{\partial}{\partial x}f(x)^T = (\frac{\partial f(x)}{\partial x})^T  \ 转置的偏微分等于偏微分的转置\\
+\frac{\partial}{\partial x}tr[f(x)] = tr[\frac{\partial f(x)}{\partial x}] \ 迹的偏微分等于偏微分的迹 \\
+\frac{\partial}{\partial x}det[f(x)] = det[f(x)]tr[f(x)^{-1}\frac{\partial f(x)}{\partial x}] \ 行列式的偏微分 \\
+\frac{\partial}{\partial x}f(x)^{-1} = -f(x)^{-1}[\frac{\partial f(x)}{\partial x}]f(x)^{-1} \ 逆的偏微分 \\
+\frac{\partial a^TX^{-1}b}{\partial X} = -(X^{-1})^Tab^T(X^{-1})^T\\
+\frac{\partial a^TXb}{\partial X} = ab^T \\
+\frac{\partial x^TBx}{\partial } = x^T(B + B^T) \\
+\frac{\partial x^Ta}{\partial x} = a^T \\
+\frac{\partial a^Tx}{\partial x} = a^T \\
+\frac{\partial}{\partial s}(x-As)^TW(x - As) = -2(x-As)^TWA, for\ symmetric W
+$$
+
+
+对于高维张量, 它的转置和迹没有定义, 在这样的情况下, 形状为$D\times D\times E\times F$的张量的迹将是一个$E\times F$形状的矩阵, 这是张量缩并(tensor contraction)的一种特殊情况, 类似的, 当我们转置一个张量时, 我们说的是交换前两个维度.
+
+> 就是对于高维张量, 把它看作2维矩阵, 只不过每一个元素都是一个矩阵, 然后执行迹计算的相加或转置的交换
+
+
+
+## 反向传播与自动微分
+
+在许多机器学习的应用中, 通过计算学习目标关于模型参数的梯度, 然后执行梯度下降找更优的模型参数.
+
+对于给定的目标函数, 可以利用微积分的链式法则得到其对于模型参数的梯度.
+
+考虑下面的函数:
+$$
+f(x) = \sqrt{x^2 + exp(x^2)} + cos[x^2+exp(x^2)]
+$$
+
+
+由链式法则 +微分的线性性, 我们可以得到
+
+> 不展开写了, 反正一长串的链式
+
+这样的显式求解麻烦得狠.
+
+对于神经网络模型, 反向传播算法是一个种计算误差对模型参数梯度的有效方法.
+
+
+
+### 深度神经网络中的梯度
+
+深度学习领域将链式法则的功用发挥到了极致, 输入x经过多层复合的函数得到函数值y:
+$$
+y = (f_k\circ f_{k-1} \circ \dots \circ f_1)(x)
+$$
+其中x是输入(如图像), y是观测值(如类标签), 每个函数f_i各有参数.
+
+在一般的多层神经网络中, 第i层中有函数
+$$
+f_i(x_{i-1}) = \sigma(A_{i-1}x_{i-1} + b_{i-1})
+$$
+训练这样的模型,需要一个损失函数L, 对它的值球关于所有模型参数$A_j, b_j$的梯度, 这同时要求我们求其对模型中各层的输入的梯度.
+
+例如, 有输入x和观测值y和一个网络结构:
+$$
+f_0:=x
+f_i:= \sigma_i(A_{i-1}f_{i-1} + b_{i-1}), i = 1,\dots,k
+$$
+
+
+我们关心找到使下面的平方损失最小的A, b:
+$$
+L(\theta) = ||y-f_k(\theta, x)||^2, 其中\theta = \{A_0, b_0, \dots,A_{k-1}, b_{k-1}\}
+$$
+根据链式法则, 可以得到:
+$$
+\frac{\partial L}{\partial \theta_{k-1}} = \frac{\partial L}{\partial f_k}\frac{\partial f_k}{\partial \theta_{k-1}}\\
+\frac{\partial L}{\partial \theta_{k-2}} = \frac{\partial L}{\partial f_k}\frac{\partial f_k}{\partial f_{k-1}}\frac{\partial f_{k-1}}{\partial \theta_{k-2}}\\
+\dots \\
+\frac{\partial L}{\partial \theta_i} = \frac{\partial L}{\partial f_k}\dots \frac{\partial f_{i+2}}{\partial f_{i+1}} \frac{\partial f_{i+1}}{\partial \theta_i}
+$$
+其中A $\frac{\partial f_m}{\partial f_{m-1}}$是某层的输出相对于输入的偏导数, 而B$\frac{\partial f_m}{\partial \theta_{m-1}}$是某层的输出相对于参数的偏导数. 
+
+其中A在计算的时候是可复用的.
+
+### 自动微分
+
+事实上, 反向传播是数值分析中常采用的自动微分(automatic differentiation)的一种特殊情况. 可以看作是一组通过中间变量和链式法则, 计算一个函数的精确数值梯度.
+
+自动微分始于一系列初等算术运算(如加法, 乘法)和初等函数(如sin, exp, log), 通过将链式法则应用于这些操作, 可以自动计算出相当复杂的函数的梯度. 自动微分适用于一般的程序, 具有正向和反向两种模式
+
+> 正向和反向?
+>
+> 从结果到输入(从最外层的函数到最内层的函数)就是反向
+>
+> 从输入到结果(从最内层的函数到最外层的函数)就是正向
+
+
+
+下面重点关注反向自动微分, 即反向传播. 在神经网络中, 输入的维度通常比标签的维度高得多, 反向自动微分在计算上比正向的计算消耗低得多.
+
+
+
+自动微分(反向)简单来说就是将一个大函数表示成初等函数为边的图结构, 然后从图的最终输出节点, 反向通过链式法则求微分.
+
+
+
+## 高阶导数
+
+梯度是一阶导数. 有时我们也关注更高阶的导数, 例如当使用牛顿法进行优化时, 需要二阶导数.
+
+在之前讨论了泰勒级数, 即使用多项式近似函数, 在多变量的情况下也可以做同样的事.
+
+考虑一个函数$f: \mathbb{R}^2\to\mathbb{R}$它有两个输入变量x,y, 我们使用以下符号表示高阶偏导数(和梯度):
+$$
+\frac{\partial ^2f}{\partial x^2}是f关于x的二阶偏导数\\
+\frac{\partial^nf}{\partial x^n}是f关于x的n阶偏导数\\
+\frac{\partial^2f}{\partial y \partial x} = \frac{\partial}{\partial y}(\frac{\partial f}{\partial x})是先对x求偏导, 然后对y求偏导得到的偏导数
+$$
+Hessian矩阵是所有二阶偏导数的集合.
+
+
+
+如果f(x, y)是二阶(连续)可微函数, 那么$\frac{\partial^2f}{\partial x \partial y} = \frac{\partial^2f}{\partial y \partial x}$, 二阶偏导与求导顺序无关, 相应的Hessian矩阵为:
+$$
+H = \begin{bmatrix} \frac{\partial^2f}{\partial x^2} & \frac{\partial^2f}{\partial x \partial y} \\\frac{\partial^2f}{\partial x \partial y} & \frac{\partial^2f}{\partial y^2}\end{bmatrix}
+$$
+且是对称的. Hessian矩阵还可以表示为$\nabla^2_{x,y}f(x,y)$, 一般地, 函数$f: \mathbb{R}^n\to\mathbb{R}$的Hessian矩阵是一个nxn矩阵.
+
+Hessian矩阵衡量了函数在(x,y)附近的局部曲率.
+
+
+
+向量场的Hessian矩阵: 如果$f: \mathbb{R}^n \to \mathbb{R}^m$是一个向量场, Hessian矩阵是一个(m x n x n)的张量
+
+
+
+## 线性近似和多元Taylor级数
 
